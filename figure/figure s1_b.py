@@ -1,0 +1,139 @@
+import cmaps
+import matplotlib.pyplot as plt
+import netCDF4 as nc
+import cartopy.crs as ccrs
+import numpy as np
+import matplotlib.ticker as mticker
+import cartopy.feature as cfeat
+import cartopy.io.shapereader as shpreader
+import matplotlib as mpl
+import matplotlib.gridspec as gridspec
+import matplotlib.patches as patches
+from netCDF4 import Dataset
+from matplotlib.colors import ListedColormap, Normalize
+from scipy.stats import linregress, pearsonr
+from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
+import matplotlib.font_manager as fm
+import maskout
+
+
+font_path = "/home/qiupch2023/.fonts/Arial.ttf"
+
+
+Arial_font = fm.FontProperties(fname=font_path)
+
+
+mpl.rcParams['font.family'] = Arial_font.get_name()  
+plt.rcParams['axes.linewidth'] = 1.3
+
+
+fig = plt.figure(figsize=(15, 7), dpi=500)
+
+def create_colormap():
+    """创建并裁剪 colormap"""
+    color_map = cmaps.MPL_terrain_r
+    num_colors = 128
+    original_colors = color_map(np.linspace(0, 1, num_colors))
+    selected_colors = original_colors[50:120]
+    return ListedColormap(selected_colors)
+
+
+def plot_map_subplot(FILE, index, ndvi_layer, title):
+    """绘制地图子图"""
+    plt.rcParams['axes.linewidth'] = 1.3
+    ax = plt.subplot(index[0],index[1],index[2], projection=ccrs.PlateCarree(), aspect="auto")
+    
+    
+    dataset = nc.Dataset(FILE)
+    lat, lon = dataset.variables['CLAT'][0, :, :], dataset.variables['CLONG'][0, :, :]
+    ndvi = dataset.variables['LAI12M'][0, ndvi_layer, :, :]
+    
+    levels = np.arange(0,0.51,0.01)
+    color_map = create_colormap()
+    norm = Normalize(vmin=0, vmax=0.5)
+    
+    contourf = plt.contourf(lon, lat, ndvi, levels, cmap=color_map, norm=norm, alpha=1, extend='max')
+    
+    con_mask = maskout.shp2clip(contourf, ax, r'/home/qiupch2023/data/shp/Mongolia/Mongolia.shp')
+    
+    
+    ax.add_feature(cfeat.COASTLINE.with_scale('10m'), linewidth=0, color='k')
+    ax.set_extent([86, 122, 41, 53], crs=ccrs.PlateCarree())
+    
+    
+    gridlines = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=0, color='gray', linestyle=':')
+    gridlines.top_labels = gridlines.bottom_labels = gridlines.right_labels = gridlines.left_labels = False
+    gridlines.xlocator = mticker.FixedLocator(np.arange(90, 124, 15))
+    gridlines.ylocator = mticker.FixedLocator(np.arange(42, 52, 3))
+    
+    ax.set_xticks(np.arange(90, 124, 15), crs=ccrs.PlateCarree())
+    ax.set_yticks(np.arange(42, 52, 3), crs=ccrs.PlateCarree())
+    ax.xaxis.set_major_formatter(LongitudeFormatter())
+    ax.yaxis.set_major_formatter(LatitudeFormatter())
+    ax.tick_params(labelcolor='k', length=5)
+    
+    
+    shape_china = shpreader.Reader('/home/qiupch2023/data/shp/Mongolia/Mongolia.shp').geometries()
+    ax.add_geometries(shape_china, ccrs.PlateCarree(), facecolor='none', edgecolor='k', linewidth=1.2, zorder=1)
+    
+    
+    plt.title(title, loc='left', fontsize=13, pad=4)
+
+    
+    ax.minorticks_on()
+    ax.tick_params(axis="both", which="major", direction="in", width=1.3, length=4, top=False, right=False)
+    ax.tick_params(axis="both", which="minor", direction="in", width=1.3, length=2, top=False, right=False)
+    ax.xaxis.set_minor_locator(mticker.MultipleLocator(5))
+    ax.yaxis.set_minor_locator(mticker.MultipleLocator(100))
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    if index[2]==1:
+        ax_inset = plt.axes([0.96, 0.15, 0.015, 0.7])  
+        plt.rcParams['axes.linewidth'] = 1
+        
+        cb3 = fig.colorbar(contourf, cax=ax_inset, orientation='vertical', drawedges=True,pad=0.02, shrink=1,aspect=22)
+        cb3.ax.tick_params(labelsize=10)
+        cb3.outline.set_edgecolor('black')
+        
+        cb3.ax.tick_params(left=False, right=False)
+        
+        cb3.ax.yaxis.set_tick_params(pad=0)  
+        
+        ticks = np.arange(0,0.51,0.1)
+        cb3.set_ticks(ticks)
+        
+        
+
+ 
+
+plot_map_subplot('/data/groups/g1600002/home/qiupch2023/lustre_data/EST_2/figure_wrf/geo_em.d01.nc', [3,4,1], 2, '(a2) Default LAI in March')
+plot_map_subplot('/data/groups/g1600002/home/qiupch2023/lustre_data/EST_2/figure_wrf/geo_em.d01_2005.nc', [3,4,2], 2, '(b2) March LAI in WRF_CTL')
+plot_map_subplot('/data/groups/g1600002/home/qiupch2023/lustre_data/EST_2/figure_wrf/geo_em.d01_2023.nc', [3,4,3], 2, '(c2) March LAI in WRF_REAL')
+plot_map_subplot('/data/groups/g1600002/home/qiupch2023/lustre_data/EST_2/figure_wrf/geo_em.d01_ideal_new.nc', [3,4,4], 2, '(d2) March LAI in WRF_REST')
+
+plot_map_subplot('/data/groups/g1600002/home/qiupch2023/lustre_data/EST_2/figure_wrf/geo_em.d01.nc', [3,4,5], 3, '(e2) Default LAI in April')
+plot_map_subplot('/data/groups/g1600002/home/qiupch2023/lustre_data/EST_2/figure_wrf/geo_em.d01_2005.nc', [3,4,6], 3, '(f2) April LAI in WRF_CTL')
+plot_map_subplot('/data/groups/g1600002/home/qiupch2023/lustre_data/EST_2/figure_wrf/geo_em.d01_2023.nc', [3,4,7], 3, '(g2) April LAI in WRF_REAL')
+plot_map_subplot('/data/groups/g1600002/home/qiupch2023/lustre_data/EST_2/figure_wrf/geo_em.d01_ideal_new.nc', [3,4,8], 3, '(h2) April LAI in WRF_REST')
+
+plot_map_subplot('/data/groups/g1600002/home/qiupch2023/lustre_data/EST_2/figure_wrf/geo_em.d01.nc', [3,4,9], 4, '(i2) Default LAI in May')
+plot_map_subplot('/data/groups/g1600002/home/qiupch2023/lustre_data/EST_2/figure_wrf/geo_em.d01_2005.nc', [3,4,10], 4, '(j2) May LAI in WRF_CTL')
+plot_map_subplot('/data/groups/g1600002/home/qiupch2023/lustre_data/EST_2/figure_wrf/geo_em.d01_2023.nc', [3,4,11], 4, '(k2) May LAI in WRF_REAL')
+plot_map_subplot('/data/groups/g1600002/home/qiupch2023/lustre_data/EST_2/figure_wrf/geo_em.d01_ideal_new.nc', [3,4,12], 4, '(l2) May LAI in WRF_REST')
+
+
+plt.subplots_adjust(left=0.04, bottom=0.05, right=0.95, top=0.95, wspace=0.16, hspace=0.24)
+plt.savefig('lai_geo.png', dpi=500)
