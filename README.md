@@ -16,11 +16,8 @@ wrfout_process: Scripts for processing WRF model output data.
 
 others: Additional utility scripts and supplemental analysis.
 
-Usage
-These scripts are intended to support the research findings and ensure scientific reproducibility as required by the AGU FAIR Data Policy.
+Usage: These scripts are intended to support the research findings and ensure scientific reproducibility as required by the AGU FAIR Data Policy.
 
-Data and Software Availability
-The code in this repository is archived on Zenodo to provide a permanent DOI for citation.
+Data and Software Availability: The code in this repository is archived on Zenodo to provide a permanent DOI for citation.
 
-License
-This project is licensed under the MIT License. See the LICENSE file for details.
+License: This project is licensed under the MIT License. See the LICENSE file for details.
