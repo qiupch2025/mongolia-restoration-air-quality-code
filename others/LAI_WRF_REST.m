@@ -18,7 +18,7 @@ landUseType = ncread(geoFilePath, 'LU_INDEX');
 s = shaperead('/home/qiupch2023/data/shp/world/world.shp');
 inPoly = inpolygon(targetLonGrid, targetLatGrid, s(47).X, s(47).Y);
 
-num_years = 2023 - 2005 + 1;
+num_years = 2023 - 2005;
 months_to_modify = 1:12;
 
 all_types = 1:19;
@@ -51,3 +51,4 @@ end
 netcdf.putVar(ncid, lai_id, lai_org);
 
 netcdf.close(ncid);
+
