@@ -1,5 +1,5 @@
 
-laiFile = '/data/groups/g1600002/home/qiupch2023/lustre_data/EST_2/Inner_Mongolia/lai_monthly_max_2001_2023_Inner_Mongolia.nc';
+laiFile = '/data/groups/g1600002/home/qiupch2023/lustre_data/EST_2/Inner_Mongolia/lai_monthly_2001_2023_Inner_Mongolia.nc';
 geoFilePath = '/data/groups/g1600002/home/qiupch2023/lustre_data/EST_2/geo/shao04/2023/geo_em.d01_2023.nc';
 shpPath = '/home/qiupch2023/data/shp/Inner_Mongolia/Inner_Mongolia.shp';
 saveFileName = 'lai_landUse_mean_growthRate.mat';
@@ -81,3 +81,4 @@ end
 
 
 save(saveFileName, 'mean_lai_byLandUse', 'growth_rate_landUse');
+
