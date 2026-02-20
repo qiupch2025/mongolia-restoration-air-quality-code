@@ -1,6 +1,6 @@
 
 laiFolderPath = '/data/groups/g1600002/home/qiupch2023/lustre_data/EST_2/N_L_A_trend/Inner_Mongolia/';
-laiFile = fullfile(laiFolderPath, 'lai_monthly_max_2001_2023_Inner_Mongolia.nc');
+laiFile = fullfile(laiFolderPath, 'lai_monthly_2001_2023_Inner_Mongolia.nc');
 
 lat = ncread(laiFile, 'latitude');
 lon = ncread(laiFile, 'longitude');
@@ -69,4 +69,5 @@ ncwrite(outputFile, 'lai_trend', lai_trend_map);
 ncwrite(outputFile, 'lai_pvalue', lai_pvalue_map);
 ncwrite(outputFile, 'lai_mean_trend', lai_mean_trend);
 ncwrite(outputFile, 'lai_mean_pvalue', lai_mean_pvalue);
+
 
